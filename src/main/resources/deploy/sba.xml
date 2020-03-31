@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation=" http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+	<bean class="org.apache.camel.impl.JavaUuidGenerator"
+		id="javaUuidGenerator" />
+        <bean class="java.util.ArrayList" id="attachmentList"/>
+        <bean class="net.rinis.servicemix.helpers.JentrataMessageCreator" id="berichtenMaker"/>
+	<camelContext streamCache="true" xmlns="http://camel.apache.org/schema/blueprint">
+
+	<route id="rinis-sba-demo">
+		 	   	
+            <from uri="imap://10.140.136.28?username=sba_xbrl&amp;password=d3v@d3r&amp;from=inbox&amp;consumer.delay=30000&amp;mapMailMessage=true&amp;fetchSize=100" />
+
+          
+            <setProperty id="sleutel" propertyName="key">
+                   <simple>${id}</simple> 
+            </setProperty>
+            
+            
+           
+           
+           <log loggingLevel="INFO" message="KEY= ${id} : ${exchangeProperty[key]}"/>         
+           
+            <log loggingLevel="INFO" message="${id} Ontvangen bericht met inhoud: ${body}"/>
+            
+            
+            <to id="_to1" uri="activemq:mailQueue?username=karaf&amp;password=karaf" />
+              
+           
+     </route>
+
+      <route id="decode base64">
+
+
+		<from uri="activemq:mailQueue?username=karaf&amp;password=karaf" />
+		        <log message="key:  ${exchangeProperty[key]} "/>
+                <log message="unmarshal  ${exchangeProperty[key]} "/>
+ 		    <unmarshal>
+     			<base64/>
+ 		   </unmarshal>
+           <setProperty id="_setProperty1" propertyName="messageBody">
+              <simple>${body}</simple>
+           </setProperty>
+           <log message="1 unmarshalled  ${id} : ${body}"/>
+
+		<to id="base64Q" uri="activemq:base64Queue?username=karaf&amp;password=karaf"/>
+
+	</route>
+	<route>
+               
+		<from uri="activemq:base64Queue?username=karaf&amp;password=karaf"/>
+		  <setBody id="_setBody7">
+                <simple>${in.body}</simple>
+          </setBody>
+		 <log message="2a. Wat is de body ${id} : ${exchangeProperty[messageBody]} : ${in.body}"/>
+                
+		        <setHeader headerName="convId" id="_setHeaderConvId">
+                     <simple>${id}</simple>
+                </setHeader>
+
+            <setProperty id="_setProperty4" propertyName="msgFileName">
+                <simple>"/tmp/${id}.dat"</simple>
+            </setProperty>
+                <log message="2b. Wat is de body ${id} : ${exchangeProperty[msgFileName]} : ${in.body} "/>
+
+                <to id="_to12" uri="file:?fileName=/tmp/${id}.dat"/>
+   
+               <log message="2c. Wat is de body ${id} : ${exchangeProperty[msgFileName]} : ${file:name} : ${in.body}"/>
+	
+               <setProperty id="_setProperty6" propertyName="bijlage_fullName">
+                    <simple>${exchangeProperty[msgFileName]}</simple>
+               </setProperty>
+
+              <!-- LET OP DAT HIER DE JUISTE EBMS URL WORDT GEZET -->
+               <setHeader headerName="Url" id="_setHeaderUrl">
+                     <!--constant>http://jentrata:8080/jentrata/httpd/ebms/sender</constant-->
+                     <constant>http://10.140.136.40:8080/corvus/httpd/ebms/sender</constant>
+                </setHeader>
+ <bean id="_bean2" method="clear()" ref="attachmentList"/>
+               <bean id="_bean4"
+                    method="add(${exchangeProperty[bijlage_fullName]})" ref="attachmentList"/>
+
+<!--
+               <bean id="_bean3"
+                method="add(${exchangeProperty[msgFileName]})" ref="attachmentList"/>
+-->
+                <log loggingLevel="INFO" message="berichtenMakert : ${exchangeProperty[msgFileName]} :: ${exchangeProperty[bijlage_fullName]}" />
+
+
+		<setBody id="_setBody10">
+                	<simple>${ref:attachmentList}</simple>
+            	</setBody>
+
+
+                
+		<bean id="_bean5" ref="berichtenMaker"/>
+		<to id="ebmsQ" uri="activemq:ebmsQueue?username=karaf&amp;password=karaf"/>
+		        <log loggingLevel="INFO" message="${id} afgeleverd"/>
+<to id="_to12" uri="file:?fileName=/tmp/${id}.dat?delete"/>
+  </route>
+
+
+ </camelContext>
+</blueprint>
+

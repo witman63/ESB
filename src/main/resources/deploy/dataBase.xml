@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation=" http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+
+<reference id="dataSource" interface="javax.sql.DataSource"/>
+	<camelContext streamCache="true"
+		xmlns="http://camel.apache.org/schema/blueprint">
+
+
+
+
+		<route id="RINIS-BEHEER_database">
+			<from id="_from7"
+				uri="activemq:dbQueue?username=karaf&amp;password=karaf" />
+			<when id="w1">
+				<simple>${in.header.queryType} == 'CREATE' </simple>
+				<setBody id="_setBody12">
+					<simple>
+						INSERT INTO BERICHT (sleutel,
+						stadium1binnen,
+						sector1,
+						sector2,
+						berichtstatus,
+						ber,
+						tijd1sub,
+						tijd1rec,
+						size_in,
+						prsfile)
+						values
+						('${header.sleutel}',
+						'${header.process1}',
+						'${header.from}',
+						'${header.to}',
+						'${header.berichtstatus}',
+						'${header.jmsType}',
+						'${header.tijd1}',
+						'${header.tijd1r}',
+						'${header.fileLength}',
+						'${header.path}' );
+					</simple>
+				</setBody>
+			</when>
+				<when id="wr3">
+				<simple>${in.header.queryType} == 'UPDATE' </simple>
+				<setBody id="_setBody12">
+					<simple>
+						UPDATE BERICHT SET
+						stadium2binnen= '${header.process2}' ,
+						stadium3binnen= '${header.process3}' ,
+						stadium4binnen=	'${header.process4}' ,
+						berichtstatus ='${header.berichtstatus}' ,
+						tijd2sub ='${header.tijd2}',
+						tijd2rec ='${header.tijd2r}',
+						tijd3sub ='${header.tijd3}',
+						tijd3rec ='${header.tijd3r}',
+						tijd4sub ='${header.tijd4}',
+						tijd4rec ='${header.tijd4r}',
+						errtext  ='${header.errtext}',
+						messageId= '${header.messageID}',
+						ber='${header.jmsType}'
+
+						WHERE
+						sleutel='${header.sleutel}'
+						;
+					</simple>
+				</setBody>
+			</when>
+
+			<when id="w2">
+				<simple>${in.header.queryType} == 'ACK' </simple>
+				<setBody id="_setBody12">
+					<simple>
+						UPDATE BERICHT SET
+						stadium4binnen=	'${header.process4}' ,
+						berichtstatus ='Acknowledge',
+						tijd4sub ='${header.tijd4}',
+						tijd4rec ='${header.tijd4r}'
+						WHERE messageId='${header.ebxml_ref_message_id}'
+						;
+					</simple>
+				</setBody>
+			</when>
+			
+
+
+
+			<log loggingLevel="INFO" message="sql= ${body}" />
+			<!--
+			<to id="dbinsert" uri="jdbc:dataSource" />
+			-->
+		</route>
+	</camelContext>
+</blueprint>
+

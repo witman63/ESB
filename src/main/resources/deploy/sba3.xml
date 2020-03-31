@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation=" http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+
+
+	<!-- OSGI blueprint property placeholder -->
+	<cm:property-placeholder persistent-id="pipo">
+	</cm:property-placeholder>
+
+	<bean class="org.apache.camel.impl.JavaUuidGenerator"
+		id="javaUuidGenerator" />
+	
+
+	
+	<camelContext streamCache="true"
+		xmlns="http://camel.apache.org/schema/blueprint">
+
+		<onException>
+		   <exception>java.io.IOException</exception>
+		   <redeliveryPolicy maximumRedeliveries="2" redeliveryDelay="2000" />
+		   <handled><constant>true</constant></handled>
+		   <transform><constant>We got an error</constant></transform>
+		   <to uri="activemq:errorQueue"/>
+		</onException>
+		<!-- 
+		<errorHandler id="mijnlog" type="LoggingErrorHandler" logName="rinis" level="ERROR"/>
+		 -->
+
+		<route id="decode base64">
+			<from uri="activemq:detQueue?username=karaf&amp;password=karaf" />
+			<log loggingLevel="INFO" message="key:  ${header.sleutel}" />
+				
+			<log loggingLevel="INFO" message="unmarshal " />
+			<setHeader headerName="tijd3" id="t3">
+				<simple>${date:now:yyyy-MM-dd HH:mm:ss.SSS}</simple>
+			</setHeader>
+
+
+			<unmarshal>
+				<base64 />
+			</unmarshal>
+
+			<setHeader headerName="berichtstatus / processQueue" id="_setHeader11d">
+				<constant>processed</constant>
+			</setHeader>
+			<setHeader headerName="process3" id="_setHeader11e">
+				<constant>1</constant>
+			</setHeader>
+
+
+			<setHeader headerName="tijd3r" id="t3r1">
+				<simple>${date:now:yyyy-MM-dd HH:mm:ss.SSS}</simple>
+			</setHeader>
+
+			<log loggingLevel="INFO" message="unmarshalled  ${id} : ${body}" />
+
+			<setHeader headerName="queryType" id="q3">
+				<constant>UPDATE</constant>
+			</setHeader>
+			<to id="_to14"
+				uri="activemq:dbQueue?username=karaf&amp;password=karaf" />
+			<to id="base64Q"
+				uri="activemq:processQueue?username=karaf&amp;password=karaf" />
+
+		</route>
+
+	</camelContext>
+</blueprint>
+
+	

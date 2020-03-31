@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation=" http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+
+
+	<!-- OSGI blueprint property placeholder -->
+	<cm:property-placeholder persistent-id="rinis_environment">
+	</cm:property-placeholder>
+
+	<bean class="org.apache.camel.impl.JavaUuidGenerator"
+		id="javaUuidGenerator" />
+  <!-- Apache artemis component -->
+	<!--
+    <bean class="org.apache.activemq.camel.component.ActiveMQComponent" 
+  	      id="activemqhcm">
+    <property name="brokerURL" 
+    	      value="tcp://{{activemq_server}}:61616"/>
+    </bean>	
+	-->
+	
+	<camelContext streamCache="true"
+		xmlns="http://camel.apache.org/schema/blueprint">
+
+		<route id="rinis-sba-demo">
+			<!--	
+			<from uri="imap://10.140.135.28?username=sba_xbrl&amp;password=d3v@d3r&amp;from=inbox&amp;consumer.delay=30000&amp;mapMailMessage=true&amp;fetchSize=100" />
+			-->
+					
+			<from uri="{{koppelvlak_a}}" />
+			<setHeader headerName="tijd1" id="t1">
+				<simple>${date:now:yyyy-MM-dd HH:mm:ss.SSS}</simple>
+			</setHeader>
+			<log loggingLevel="INFO" message="Koppelvlak= {{koppelvlak_a}}" />
+
+			<setHeader headerName="sleutel" id="_setHeader1">
+				<simple>${id}</simple>
+			</setHeader>
+			<setHeader headerName="berichtstatus" id="_setHeader11c">
+				<constant>off loaded/rcvdQueue</constant>
+			</setHeader>
+			<setHeader headerName="process1" id="_setHeader11">
+				<constant>1</constant>
+			</setHeader>
+			<setHeader headerName="path" id="_setHeader9">
+				<simple>${file:path}</simple>
+			</setHeader>
+			<setHeader headerName="fileLength" id="_setHeader10">
+				<simple>${file:length}</simple>
+			</setHeader>
+			<setHeader headerName="queryType" id="q1">
+				<constant>CREATE</constant>
+			</setHeader>
+			<setHeader headerName="JMSType" id="w15">
+				<constant>776</constant>
+			</setHeader>
+
+			<setHeader headerName="from" id="_from">
+				<constant>{{koppelvlak_type_a}}	</constant>
+			</setHeader>
+
+			<setHeader headerName="to" id="_to">
+				<constant>EBMS</constant>
+			</setHeader>
+
+			<log loggingLevel="INFO" message="KEY= ${id}" />
+			<log loggingLevel="INFO" message="Ontvangen bericht met inhoud: ${body}" />
+
+			<setHeader headerName="tijd1r" id="t1r">
+				<simple>${date:now:yyyy-MM-dd HH:mm:ss.SSS}</simple>
+			</setHeader>
+
+			<to id="_to1" uri="activemq:rcvdQueue?username=karaf&amp;password=karaf" />
+			<to id="_to13" uri="activemq:dbQueue?username=karaf&amp;password=karaf" />
+		</route>
+
+	</camelContext>
+</blueprint>
+
+	

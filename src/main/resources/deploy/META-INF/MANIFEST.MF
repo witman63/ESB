@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1550483089933
+Build-Jdk: 1.8.0_181
+Built-By: martindewit
+Bundle-Description: generiek_helper
+Bundle-ManifestVersion: 2
+Bundle-Name: generiek_helper
+Bundle-SymbolicName: generiek_helper
+Bundle-Version: 1.0.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: net.rinis.servicemix.helpers;version="1.0.0";uses:="or
+ g.apache.camel,org.apache.camel.processor.aggregate"
+Import-Package: javax.activation,javax.json;version="[1.1,2)",javax.js
+ on.stream;version="[1.1,2)",javax.xml.soap,org.apache.camel;version="
+ [2.16,3)",org.apache.camel.processor.aggregate;version="[2.16,3)",org
+ .slf4j;version="[1.6,2)",org.w3c.dom
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Tool: Bnd-3.3.0.201609221906

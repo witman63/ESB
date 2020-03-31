@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.5.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation=" http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+
+
+	<!-- OSGI blueprint property placeholder -->
+	<cm:property-placeholder persistent-id="pipo">
+	</cm:property-placeholder>
+
+	<bean class="org.apache.camel.impl.JavaUuidGenerator"
+		id="javaUuidGenerator" />
+	
+
+	
+	<camelContext streamCache="true"
+		xmlns="http://camel.apache.org/schema/blueprint">
+
+		<onException>
+		   <exception>java.io.IOException</exception>
+		   <redeliveryPolicy maximumRedeliveries="2" redeliveryDelay="2000" />
+		   <handled><constant>true</constant></handled>
+		   <transform><constant>We got an error</constant></transform>
+		   <to uri="activemq:errorQueue"/>
+		</onException>
+		<!-- 
+		<errorHandler id="mijnlog" type="LoggingErrorHandler" logName="rinis" level="ERROR"/>
+		 -->
+		<route id="determinatie">
+			<from uri="activemq:rcvdQueue?username=karaf&amp;password=karaf" />
+                        <log loggingLevel="INFO" message="sleutel  ${header.sleutel} determining" />
+			<when id="w3">
+				<simple> ${header.JMSType} == '' </simple>
+				<setHeader headerName="JMSType" id="w15a">
+					<constant>776</constant>
+				</setHeader>
+			</when>
+			<setHeader headerName="tijd2" id="t2">
+				<simple>${date:now:yyyy-MM-dd HH:mm:ss.SSS}</simple>
+			</setHeader>
+                        <setHeader headerName="berichtstatus" id="_setHeader11d">
+				<constant>determined / detQueue</constant>
+			</setHeader>
+			<setHeader headerName="tijd3" id="t2a">
+				<constant></constant>
+			</setHeader>
+			<setHeader headerName="tijd4" id="t2b">
+				<constant></constant>
+			</setHeader>
+			<setHeader headerName="tijd3r" id="t3r">
+				<constant></constant>
+			</setHeader>
+			<setHeader headerName="tijd4r" id="t2x">
+				<constant></constant>
+			</setHeader>
+			<setHeader headerName="process2" id="_setHeader11f">
+				<constant>1</constant>
+			</setHeader>
+
+			<setHeader headerName="queryType" id="q2">
+				<constant>UPDATE</constant>
+			</setHeader>
+
+			<setHeader headerName="tijd2r" id="t2r">
+				<simple>${date:now:yyyy-MM-dd HH:mm:ss.SSS}</simple>
+			</setHeader>
+			<log loggingLevel="INFO" message="${header.sleutel} to detQueue" />
+			<to id="_to14a"
+				uri="activemq:dbQueue?username=karaf&amp;password=karaf" />
+			<to id="detQ"
+				uri="activemq:detQueue?username=karaf&amp;password=karaf" />
+
+		</route>
+
+	</camelContext>
+</blueprint>
+
+	

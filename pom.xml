@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<!--
+      Licensed to the Apache Software Foundation (ASF) under one or more
+      contributor license agreements.  See the NOTICE file distributed with
+      this work for additional information regarding copyright ownership.
+      The ASF licenses this file to You under the Apache License, Version 2.0
+      (the "License"); you may not use this file except in compliance with
+      the License.  You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    -->
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>nl.rinis</groupId>
+	<artifactId>karaf-rinis</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>karaf-assembly</packaging>
+	<name>karaf-rinis-feature</name>
+	<description>karaf-rinis details</description>
+	<repositories>
+		<!-- Apache ServiceMix repository (for region) -->
+		<repository>
+			<id>apache.servicemix.7.0.1</id>
+			<name>Apache ServiceMix M2 repository</name>
+			<!--     <url>http://svn.apache.org/repos/asf/servicemix/m2-repo</url>-->
+			<!--url>https://mvnrepository.com/artifact/org.apache.servicemix/servicemix</url-->
+			<url>https://mvnrepository.com/artifact/org.apache.camel/camel-core</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<!-- OPS4J SNAPSHOT repository -->
+		<repository>
+			<id>ops4j.sonatype.snapshots.deploy</id>
+			<name>OPS4J snapshot repository</name>
+			<url>https://oss.sonatype.org/content/repositories/ops4j-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<!-- Apache SNAPSHOT -->
+		<repository>
+			<id>apache.snapshots.deploy</id>
+			<name>Apache snapshot repository</name>
+			<url>https://repository.apache.org/content/groups/snapshots-group</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>Maven Central</id>
+			<url>http://central.maven.org/maven2</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<!-- DEPENDENCIES -->
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.karaf.features</groupId>
+			<artifactId>framework</artifactId>
+			<version>4.1.2</version>
+			<type>kar</type>
+		</dependency>
+		<!-- https://repo1.maven.org/maven2/org/apache/camel/karaf/apache-camel/2.15.2/apache-camel-2.15.2-features.xml -->
+		<dependency>
+			<groupId>org.apache.camel.karaf</groupId>
+			<artifactId>apache-camel</artifactId>
+			<version>2.19.3</version>
+			<classifier>features</classifier>
+			<type>xml</type>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.hawt</groupId>
+			<artifactId>hawtio-karaf</artifactId>
+			<version>2.0.3</version>
+			<classifier>features</classifier>
+			<scope>compile</scope>
+			<type>xml</type>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.camel/camel-core -->
+		<!--<dependency><groupId>org.apache.camel</groupId><artifactId>camel-core</artifactId><version>2.19.3</version><classifier>features</classifier></dependency>-->
+		<dependency>
+			<groupId>org.apache.karaf.features</groupId>
+			<artifactId>standard</artifactId>
+			<version>4.1.2</version>
+			<classifier>features</classifier>
+			<type>xml</type>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.karaf.features</groupId>
+			<artifactId>spring</artifactId>
+			<version>4.1.2</version>
+			<classifier>features</classifier>
+			<type>xml</type>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.karaf.features</groupId>
+			<artifactId>enterprise</artifactId>
+			<version>4.1.2</version>
+			<classifier>features</classifier>
+			<type>xml</type>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.activemq/activemq-all -->
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-karaf</artifactId>
+			<version>5.15.0</version>
+			<classifier>features</classifier>
+			<type>xml</type>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-install-plugin</artifactId>
+			<version>2.5.2</version>
+			<type>maven-plugin</type>
+		</dependency>
+	</dependencies>
+	<build>
+		<!--
+        <outputDirectory>${basedir}/target/deploy</outputDirectory>
+        <resourcesresources>
+            <resource>
+                <directory>src/main/resources/deploy</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/filtered-resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+-->
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.karaf.tooling</groupId>
+					<artifactId>karaf-maven-plugin</artifactId>
+					<version>4.1.2</version>
+					<extensions>true</extensions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>2.5.2</version>
+					<extensions>true</extensions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<!-- here the phase you need -->
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/deploy</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources/deploy</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.karaf.tooling</groupId>
+				<artifactId>karaf-maven-plugin</artifactId>
+				<configuration>
+					<installedBundles>
+						<!--installedBundle>mvn:commons-lang/commons-lang/2.6</installedBundle-->
+						<installedBundle>mvn:org.apache.activemq/activemq-karaf/5.15.0/xml/features</installedBundle>
+						<installedBundle>mvn:org.apache.activemq/artemis-features/RELEASE/xml/features</installedBundle>
+						<!--installedBundle>mvn:postgresql/postgresql/9.1-901-1.jdbc4</installedBundlei-->
+					</installedBundles>
+					<bootFeatures>
+						<feature>standard</feature>
+						<feature>config</feature>
+						<feature>package</feature>
+						<feature>kar</feature>
+						<feature>ssh</feature>
+						<feature>activemq-broker</feature>
+						<feature>activemq-client</feature>
+						<feature>management</feature>
+						<feature>camel</feature>
+						<feature>camel-base64</feature>
+						<feature>camel-cxf</feature>
+						<feature>camel-mail</feature>
+						<feature>camel-jms</feature>
+						<feature>camel-jsch</feature>
+						<feature>camel-jdbc</feature>
+						<feature>hawtio</feature>
+						<!--feature>aries-blueprint</feature-->
+						<!--feature>shell</feature-->
+						<!--feature>shell-compat</feature-->
+						<feature>feature</feature>
+						<feature>jaas</feature>
+						<feature>bundle</feature>
+						<feature>deployer</feature>
+						<feature>diagnostic</feature>
+						<feature>feature</feature>
+						<feature>instance</feature>
+						<feature>log</feature>
+						<feature>package</feature>
+						<feature>service</feature>
+						<feature>system</feature>
+						<feature>aries-proxy</feature>
+						<feature>camel-core</feature>
+						<feature>jdbc</feature>
+						<feature>pax-jdbc-postgresql</feature>
+						<feature>pax-jdbc-config</feature>
+						<feature>pax-jdbc-pool-dbcp2</feature>
+					</bootFeatures>
+					<installedFeatures>
+						<feature>war</feature>
+						<feature>jndi</feature>
+						<feature>jpa</feature>
+						<feature>openjpa</feature>
+						<feature>jms</feature>
+						<feature>transaction</feature>
+						<feature>spring</feature>
+					</installedFeatures>
+					<javase>1.8</javase>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
